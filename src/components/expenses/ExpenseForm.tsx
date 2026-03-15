@@ -40,9 +40,10 @@ interface ExpenseFormProps {
   defaultValues?: Partial<FormData & { participants?: Participant[] }>;
   expenseId?: string;
   mode?: "create" | "edit";
+  onSuccess?: () => void;
 }
 
-export function ExpenseForm({ defaultValues, expenseId, mode = "create" }: ExpenseFormProps) {
+export function ExpenseForm({ defaultValues, expenseId, mode = "create", onSuccess }: ExpenseFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
@@ -179,7 +180,11 @@ export function ExpenseForm({ defaultValues, expenseId, mode = "create" }: Expen
       qc.invalidateQueries({ queryKey: ["expenses"] });
       qc.invalidateQueries({ queryKey: ["balances"] });
       toast(mode === "edit" ? "Expense updated!" : "Expense added!");
-      router.push(data.groupId ? `/groups/${data.groupId}` : "/expenses");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push(data.groupId ? `/groups/${data.groupId}` : "/expenses");
+      }
     } catch (err: any) {
       toast(err.message ?? "Failed to save expense", "error");
     } finally {

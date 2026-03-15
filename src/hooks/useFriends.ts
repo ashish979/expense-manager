@@ -35,7 +35,19 @@ export function useSendFriendRequest() {
       }
       return res.json();
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["friends"] }),
+    onMutate: async (email) => {
+      await qc.cancelQueries({ queryKey: ["friends"] });
+      const prev = qc.getQueryData(["friends"]);
+      qc.setQueryData(["friends"], (old: any[]) => [
+        ...(old ?? []),
+        { id: `temp-${Date.now()}`, email, name: email, status: "pending" },
+      ]);
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["friends"], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["friends"] }),
   });
 }
 

@@ -1,20 +1,23 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { useExpenses, useDeleteExpense } from "@/hooks/useExpenses";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ListSkeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
+import { Modal } from "@/components/ui/Modal";
+import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { formatCents } from "@/lib/csv-export";
 import { formatDistanceToNow } from "date-fns";
 import { Plus, Receipt, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function ExpensesPage() {
   const { data: session } = useSession();
   const [page, setPage] = useState(1);
+  const [showAddModal, setShowAddModal] = useState(false);
   const { data, isLoading } = useExpenses(undefined, page);
   const deleteExpense = useDeleteExpense();
   const { toast } = useToast();
@@ -29,11 +32,9 @@ export default function ExpensesPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Expenses</h1>
-        <Link href="/expenses/new">
-          <Button size="sm">
-            <Plus className="h-4 w-4" /> Add expense
-          </Button>
-        </Link>
+        <Button size="sm" onClick={() => setShowAddModal(true)}>
+          <Plus className="h-4 w-4" /> Add expense
+        </Button>
       </div>
 
       {isLoading ? (
@@ -42,9 +43,7 @@ export default function ExpensesPage() {
         <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-12 text-center">
           <Receipt className="h-10 w-10 mx-auto text-gray-300 mb-3" />
           <p className="text-gray-500 mb-4">No expenses yet.</p>
-          <Link href="/expenses/new">
-            <Button>Add your first expense</Button>
-          </Link>
+          <Button onClick={() => setShowAddModal(true)}>Add your first expense</Button>
         </div>
       ) : (
         <>
@@ -118,6 +117,11 @@ export default function ExpensesPage() {
           )}
         </>
       )}
+      <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="Add expense">
+        <Suspense fallback={<div className="py-8 text-center text-gray-400">Loading...</div>}>
+          <ExpenseForm onSuccess={() => setShowAddModal(false)} />
+        </Suspense>
+      </Modal>
     </div>
   );
 }

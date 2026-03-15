@@ -1,11 +1,14 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { useBalances } from "@/hooks/useBalances";
 import { useExpenses } from "@/hooks/useExpenses";
 import { CardSkeleton, ListSkeleton } from "@/components/ui/Skeleton";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { formatCents } from "@/lib/csv-export";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -20,6 +23,7 @@ function AmountBadge({ cents }: { cents: number }) {
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const [showAddModal, setShowAddModal] = useState(false);
   const { data: balances, isLoading: balLoading } = useBalances();
   const { data: expensesData, isLoading: expLoading } = useExpenses();
 
@@ -29,11 +33,9 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-bold">
           Hi, {session?.user?.name?.split(" ")[0]} 👋
         </h1>
-        <Link href="/expenses/new">
-          <Button size="sm">
-            <Plus className="h-4 w-4" /> Add expense
-          </Button>
-        </Link>
+        <Button size="sm" onClick={() => setShowAddModal(true)}>
+          <Plus className="h-4 w-4" /> Add expense
+        </Button>
       </div>
 
       {/* Balance summary */}
@@ -122,11 +124,9 @@ export default function DashboardPage() {
         ) : expensesData?.expenses?.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
             <p>No expenses yet.</p>
-            <Link href="/expenses/new">
-              <Button variant="secondary" size="sm" className="mt-2">
-                Add your first expense
-              </Button>
-            </Link>
+            <Button variant="secondary" size="sm" className="mt-2" onClick={() => setShowAddModal(true)}>
+              Add your first expense
+            </Button>
           </div>
         ) : (
           <div className="space-y-1">
@@ -149,6 +149,11 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+      <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="Add expense">
+        <Suspense fallback={<div className="py-8 text-center text-gray-400">Loading...</div>}>
+          <ExpenseForm onSuccess={() => setShowAddModal(false)} />
+        </Suspense>
+      </Modal>
     </div>
   );
 }

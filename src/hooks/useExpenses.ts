@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { ExpenseDTO } from "@/types";
 
 async function fetchExpenses(groupId?: string, page = 1) {
@@ -13,6 +13,7 @@ export function useExpenses(groupId?: string, page = 1) {
   return useQuery({
     queryKey: ["expenses", groupId ?? "all", page],
     queryFn: () => fetchExpenses(groupId, page),
+    placeholderData: keepPreviousData,
   });
 }
 
