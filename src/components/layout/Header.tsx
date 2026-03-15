@@ -3,14 +3,22 @@
 import { useSession, signOut } from "next-auth/react";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import { LogOut, Sun, Moon } from "lucide-react";
+import { LogOut, Sun, Moon, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/components/ThemeProvider";
 
 export function Header() {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const queryClient = useQueryClient();
+
+  const handleClearCacheAndLogout = () => {
+    queryClient.clear();
+    localStorage.clear();
+    signOut({ callbackUrl: "/signin" });
+  };
 
   return (
     <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-20">
@@ -42,6 +50,12 @@ export function Header() {
                 className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 <LogOut className="h-4 w-4" /> Sign out
+              </button>
+              <button
+                onClick={handleClearCacheAndLogout}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <Trash2 className="h-4 w-4" /> Clear cache &amp; logout
               </button>
             </div>
           )}

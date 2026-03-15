@@ -3,8 +3,20 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Expense Manager",
+  title: "SplitEase",
   description: "Split expenses with friends and groups",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SplitEase",
+  },
+  icons: {
+    apple: "/icon-192.svg",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
