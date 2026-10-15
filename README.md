@@ -75,17 +75,21 @@ Requires Node 20+, a MongoDB instance and Google OAuth credentials.
 git clone https://github.com/ashish979/expense-manager.git
 cd expense-manager
 npm ci
-cp .env.example .env.local   # fill in values
+cp .env.local.example .env.local   # fill in values
 npm run dev                  # http://localhost:3000
 ```
 
-Try it **without Google**: start a local `mongod`, then
+Try it **without Google** (demo mode):
 
 ```bash
-MONGODB_URI=mongodb://127.0.0.1:27017/splitease node scripts/seed-demo.mjs
+mongod --dbpath ./.data &                                   # local MongoDB
+export MONGODB_URI=mongodb://127.0.0.1:27017/splitease
+node scripts/seed-demo.mjs                                  # fictional data (drops the target DB!)
+# in .env.local: MONGODB_URI=..., AUTH_SECRET=anything, DEMO_MODE=true
+npm run dev
 ```
 
-and set the cookie `authjs.session-token=demo-session-token-0000` for `localhost` before opening `/dashboard`. The seed script drops the target database, so use a throwaway one.
+Open http://localhost:3000/signin and click **Try the demo**, or visit `/api/demo-login`. The route returns 404 unless `DEMO_MODE=true`, so it is inert in production. Alternatively set the cookie `authjs.session-token=demo-session-token-0000` by hand.
 
 ```bash
 npm test   # unit + model tests
@@ -101,6 +105,7 @@ npm test   # unit + model tests
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `NEXTAUTH_URL` | App URL, e.g. `http://localhost:3000` |
 | `AUTH_TRUST_HOST` | `true` behind a proxy or on some hosts |
+| `DEMO_MODE` | `true` enables `/api/demo-login` (local demos only) |
 
 Google redirect URI: `<NEXTAUTH_URL>/api/auth/callback/google`.
 

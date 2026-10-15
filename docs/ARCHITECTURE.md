@@ -121,6 +121,7 @@ erDiagram
 - Auth.js v5 (`next-auth@5`) with the Google provider and the MongoDB adapter; sessions are stored in the database (`strategy: "database"`, 30-day expiry, refreshed daily).
 - `session` callback copies `user.id` onto the session so handlers can scope queries.
 - `src/middleware.ts` is a cheap cookie-presence gate: it redirects unauthenticated users away from app routes and logged-in users away from `/signin`. It does **not** validate the session; every API handler calls `auth()` itself and returns 401.
+- `GET /api/demo-login` (only when `DEMO_MODE=true`) creates a session row for the seeded demo user and sets the session cookie, so reviewers can explore without Google credentials.
 - Handlers only return data where the caller is a payer/participant/member.
 
 ## Balances and debt simplification
@@ -138,7 +139,7 @@ erDiagram
 
 ## Configuration
 
-See `.env.example`: `MONGODB_URI`, `AUTH_SECRET`/`NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_URL`, `AUTH_TRUST_HOST`.
+See `.env.local.example`: `MONGODB_URI`, `AUTH_SECRET`/`NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_URL`, `AUTH_TRUST_HOST`.
 
 ## Deployment
 
