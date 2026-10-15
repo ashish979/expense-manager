@@ -47,6 +47,15 @@ export default function SignInPage() {
           </button>
         </form>
 
+        {process.env.DEMO_MODE === "true" && (
+          <a
+            href="/api/demo-login"
+            className="block w-full rounded-lg bg-emerald-600 px-4 py-3 text-center text-sm font-medium text-white hover:bg-emerald-700 transition-colors"
+          >
+            Try the demo (no sign-in)
+          </a>
+        )}
+
         <p className="text-xs text-center text-gray-400">
           By signing in, you agree to our Terms of Service and Privacy Policy.
         </p>
