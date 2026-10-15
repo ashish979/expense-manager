@@ -68,6 +68,9 @@ export function calculateBalances(
       if (processed.has(key)) continue;
       processed.add(key);
 
+      // Only pairs involving the requesting user are relevant to them.
+      if (a !== userId && b !== userId) continue;
+
       const diff = (net[a][b] ?? 0);
       if (diff > 0) {
         debts.push({ from: b, to: a, amount: diff });

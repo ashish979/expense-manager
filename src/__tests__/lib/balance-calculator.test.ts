@@ -264,4 +264,25 @@ describe("calculateBalances", () => {
     expect(result.totalOwe).toBe(0);
     expect(result.debts).toEqual([]);
   });
+
+  // ---------------------------------------------------------------------------
+  // Debts only include pairs involving the requesting user
+  // ---------------------------------------------------------------------------
+  it("excludes debts between other users and nets one entry per person", () => {
+    const F2 = "friend2";
+    const result = calculateBalances(
+      [
+        // Two separate expenses (e.g. different groups) with the same friend
+        { paidBy: USER, splits: [{ userId: USER, amount: 500 }, { userId: FRIEND, amount: 500 }] },
+        { paidBy: USER, splits: [{ userId: USER, amount: 300 }, { userId: FRIEND, amount: 300 }] },
+        // Unrelated to USER: FRIEND owes F2
+        { paidBy: F2, splits: [{ userId: F2, amount: 700 }, { userId: FRIEND, amount: 700 }] },
+      ],
+      [],
+      USER
+    );
+    expect(result.debts).toEqual([{ from: FRIEND, to: USER, amount: 800 }]);
+    expect(result.totalOwed).toBe(800);
+    expect(result.totalOwe).toBe(0);
+  });
 });
